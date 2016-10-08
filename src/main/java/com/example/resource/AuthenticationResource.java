@@ -47,7 +47,7 @@ public class AuthenticationResource {
     public Response authenticateUser(@FormParam("username") String username,
                                      @FormParam("password") String password) {
 
-        Date expiry = getExpiryDate(15);
+        Date expiry = getExpiryDate(120);
         User user = authenticate(username, password);
 
         // Issue a token (can be a random String persisted to a database or a JWT token)
