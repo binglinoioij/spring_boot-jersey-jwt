@@ -4,7 +4,6 @@
 package com.example.filter;
 
 
-
 import com.example.entity.mongo.User;
 import com.example.exception.EntityNotFoundException;
 import com.example.repository.UserRepository;
@@ -46,7 +45,7 @@ public class JWTSecurityFilter implements ContainerRequestFilter {
     @Context
     UserRepository dao;
 
-    String key="qwertyuiop";
+    String key = "qwertyuiop";
 
     @Context
     SecurityContext securityContext;
@@ -74,7 +73,8 @@ public class JWTSecurityFilter implements ContainerRequestFilter {
 
         String authorizationHeader = ((ContainerRequest) requestContext).getHeaderString("authorization");
         if (authorizationHeader == null) {
-            throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+            requestContext.setSecurityContext(new SecurityContextAuthorizer(uriInfo, () -> "anonymous", new String[]{"anonymous"}));
+            return;
         }
 
         String strToken = extractJwtTokenFromAuthorizationHeader(authorizationHeader);

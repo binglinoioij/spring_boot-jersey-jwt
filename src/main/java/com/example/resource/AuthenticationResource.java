@@ -10,6 +10,7 @@ import com.example.exception.EntityNotFoundException;
 import com.example.repository.UserRepository;
 import com.example.util.TokenUtil;
 
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -49,6 +50,9 @@ public class AuthenticationResource {
     @Inject
     private StringRedisTemplate stringRedisTemplate;
 
+    @Inject
+    private RedisProperties redisProperties;
+
     String key = "qwertyuiop";
 
     String redisKey = "USER_{0}_TOKEN";
@@ -61,6 +65,7 @@ public class AuthenticationResource {
 
         Date expiry = getExpiryDate(120);
         User user = authenticate(username, password);
+
 
         // Issue a token (can be a random String persisted to a database or a JWT token)
         // The issued token must be associated to a user
