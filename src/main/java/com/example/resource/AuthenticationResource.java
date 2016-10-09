@@ -4,25 +4,33 @@
 package com.example.resource;
 
 
-
 import com.example.entity.bean.Token;
 import com.example.entity.mongo.User;
 import com.example.exception.EntityNotFoundException;
 import com.example.repository.UserRepository;
 import com.example.util.TokenUtil;
 
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+
 import java.security.Key;
+import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import javax.annotation.security.PermitAll;
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
@@ -38,8 +46,12 @@ public class AuthenticationResource {
     @Context
     UserRepository dao;
 
-    @Context
-    Key key;
+    @Inject
+    private StringRedisTemplate stringRedisTemplate;
+
+    String key = "qwertyuiop";
+
+    String redisKey = "USER_{0}_TOKEN";
 
     @POST
     @Produces("application/json")
@@ -53,20 +65,48 @@ public class AuthenticationResource {
         // Issue a token (can be a random String persisted to a database or a JWT token)
         // The issued token must be associated to a user
         // Return the issued token
-        String jwtString = TokenUtil.getJWTString(username, user.getRoles(), user.getVersion(), expiry, key);
+        String jwtString = TokenUtil.getJWTString(username, user.getRoles(), user.getVersion(), user.getId(), expiry, key);
         Token token = new Token();
         token.setAuthToken(jwtString);
         token.setExpires(expiry);
-
+        ValueOperations<String, String> opsForValue = stringRedisTemplate.opsForValue();
+        opsForValue.set(MessageFormat.format(redisKey, user.getId().toString()), jwtString, 120, TimeUnit.MINUTES);
         return Response.ok(token).build();
+    }
+
+    @Path("refresh")
+    @GET
+    @Produces("application/json")
+    public Response refreshToken(@QueryParam("token") String token) {
+        String key = "qwertyuiop";
+        if (TokenUtil.isValidByStringKey(token, key)) {
+            Long id = Long.valueOf(TokenUtil.getId(token, key));
+            String tokenInRedis = stringRedisTemplate.opsForValue().get(MessageFormat.format(redisKey, id.toString()));
+            if (null == tokenInRedis || !tokenInRedis.equals(token)) {
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+            Date expiry = getExpiryDate(120);
+            String userName = TokenUtil.getName(token, key);
+            String[] roles = TokenUtil.getRoles(token, key);
+            Integer version = TokenUtil.getVersion(token, key);
+            String jwtString = TokenUtil.getJWTString(userName, roles, version, id, expiry, key);
+            Token jwtToken = new Token();
+            jwtToken.setAuthToken(jwtString);
+            jwtToken.setExpires(expiry);
+            ValueOperations<String, String> opsForValue = stringRedisTemplate.opsForValue();
+            opsForValue.set(MessageFormat.format(redisKey, id.toString()), jwtString, 120, TimeUnit.MINUTES);
+            return Response.ok(jwtToken).build();
+        } else {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        }
     }
 
     /**
      * get Expire date in minutes.
      *
      * @param minutes the minutes in the future.
-     * @return
      */
+
     private Date getExpiryDate(int minutes) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());

@@ -46,8 +46,7 @@ public class JWTSecurityFilter implements ContainerRequestFilter {
     @Context
     UserRepository dao;
 
-    @Context
-    Key key;
+    String key="qwertyuiop";
 
     @Context
     SecurityContext securityContext;

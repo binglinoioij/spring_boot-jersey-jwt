@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.sql.DataSource;
 import javax.ws.rs.core.Context;
 
 /**
@@ -20,6 +21,9 @@ public class UserBeanServiceImpl implements UserBeanService {
 
     @Inject
     private UserBeanMapper userBeanMapper;
+
+    @Inject
+    private DataSource dataSource;
 
     @Override
     public List<UserBean> findAll() {

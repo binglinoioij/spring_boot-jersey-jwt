@@ -24,6 +24,6 @@ public interface UserBeanMapper {
     @Select("select * from user_bean")
     List<UserBean> findAll();
 
-    @Insert("insert into user_bean(name,password) values ( #{name}, #{password} )")
+    @Insert("insert into user_bean( name, password ) values ( #{name}, #{password} )")
     void save(UserBean userBean);
 }
