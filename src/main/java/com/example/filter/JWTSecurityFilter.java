@@ -10,15 +10,12 @@ import com.example.repository.UserRepository;
 import com.example.util.TokenUtil;
 
 import org.glassfish.jersey.server.ContainerRequest;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.security.Key;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
 import javax.annotation.Priority;
-import javax.inject.Inject;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -58,9 +55,16 @@ public class JWTSecurityFilter implements ContainerRequestFilter {
         return auth.replaceFirst("[B|b][E|e][A|a][R|r][E|e][R|r] ", "").replace(" ", "");
     }
 
+    /*
+    get application.wadl和application.wadl/xsd0.xsd不做拦截
+    wadl Web 应用程序描述语言
+    post 方法如果是 申请token 也不做拦截
+    当然还有其它不需要拦截的url，应当做 正则匹配，这部分用户是普通 的未登录用户
+     */
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
 
+        logger.info("进入 filter");
         String method = requestContext.getMethod().toLowerCase();
         String path = ((ContainerRequest) requestContext).getPath(true).toLowerCase();
 
@@ -93,6 +97,7 @@ public class JWTSecurityFilter implements ContainerRequestFilter {
                     if (user.getVersion() == version && user.getRoles() != null &&
                             Arrays.asList(user.getRoles()).containsAll(Arrays.asList(roles))) {
                         requestContext.setSecurityContext(new SecurityContextAuthorizer(uriInfo, () -> name, roles));
+                        logger.info("校验合法");
                         return;
                     } else {
                         logger.info("Version or roles did not match the token");

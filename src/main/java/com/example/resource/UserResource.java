@@ -5,6 +5,9 @@ import com.example.entity.mongo.User;
 import com.example.service.UserBeanService;
 import com.example.service.UserService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 import javax.annotation.security.PermitAll;
@@ -27,6 +30,8 @@ import javax.ws.rs.core.Response;
 @RolesAllowed("user")
 public class UserResource {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Inject
     private UserService userService;
 
@@ -43,6 +48,11 @@ public class UserResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response listUserBean() {
+        logger.info("hello logger type={}", "info");
+        logger.warn("hello logger type={}", "warn");
+        logger.error("hello logger type={}", "error");
+        logger.debug("hello logger type={}", "debug");
+
         List<UserBean> userBeans = userBeanService.findAll();
         return Response.ok().entity(userBeans).build();
     }

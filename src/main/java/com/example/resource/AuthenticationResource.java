@@ -10,12 +10,9 @@ import com.example.exception.EntityNotFoundException;
 import com.example.repository.UserRepository;
 import com.example.util.TokenUtil;
 
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
-import java.security.Key;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -50,8 +47,6 @@ public class AuthenticationResource {
     @Inject
     private StringRedisTemplate stringRedisTemplate;
 
-    @Inject
-    private RedisProperties redisProperties;
 
     String key = "qwertyuiop";
 
@@ -83,10 +78,13 @@ public class AuthenticationResource {
     @GET
     @Produces("application/json")
     public Response refreshToken(@QueryParam("token") String token) {
-        String key = "qwertyuiop";
+
+        logger.info("token is "+token);
         if (TokenUtil.isValidByStringKey(token, key)) {
             Long id = Long.valueOf(TokenUtil.getId(token, key));
             String tokenInRedis = stringRedisTemplate.opsForValue().get(MessageFormat.format(redisKey, id.toString()));
+
+
             if (null == tokenInRedis || !tokenInRedis.equals(token)) {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
@@ -102,6 +100,8 @@ public class AuthenticationResource {
             opsForValue.set(MessageFormat.format(redisKey, id.toString()), jwtString, 120, TimeUnit.MINUTES);
             return Response.ok(jwtToken).build();
         } else {
+
+            logger.info("404");
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
     }
