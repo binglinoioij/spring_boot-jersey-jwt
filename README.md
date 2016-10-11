@@ -34,3 +34,9 @@ GET http://localhost:8080/users
 在Headers 中添加
 `Authorization Bearer "${上一步获取的token}"
 返回mongo中的所有user文档
+
+
+## 
+集成通用 Mapper 和 分页插件 Mybatis-PageHelper 集成
+通用 Mapper https://github.com/abel533/Mapper)
+Myabtis 分页插件 https://github.com/pagehelper/Mybatis-PageHelper
