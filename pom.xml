@@ -6,7 +6,11 @@
 	<groupId>com.example</groupId>
 	<artifactId>jersey-2</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<modules>
+		<module>example-common</module>
+		<module>example-app</module>
+	</modules>
+	<packaging>pom</packaging>
 
 	<name>jersey-2</name>
 	<description>Demo project for Spring Boot</description>
@@ -133,7 +137,7 @@
 		</dependency>
 	</dependencies>
 
-	<build>
+	<!--<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -173,7 +177,7 @@
 				</dependencies>
 			</plugin>
 		</plugins>
-	</build>
+	</build>-->
 
 
 </project>

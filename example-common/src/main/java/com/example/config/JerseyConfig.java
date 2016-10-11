@@ -8,11 +8,19 @@ import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
+import org.glassfish.jersey.servlet.ServletContainer;
+import org.glassfish.jersey.servlet.ServletProperties;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 
+import javax.crypto.SecretKey;
 import javax.inject.Inject;
+
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.crypto.MacProvider;
 
 /**
  * Created by binglin on 2016/9/11.
@@ -46,4 +54,5 @@ public class JerseyConfig extends ResourceConfig {
     public void setKey(Key key) {
         this.key = key;
     }
+
 }

@@ -30,4 +30,5 @@ public class RedissonConfig {
                 .setDatabase(redisProperties.getDatabase());
         return Redisson.create(config);
     }
+
 }

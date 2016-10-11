@@ -1,12 +1,9 @@
 package com.example;
 
 import com.example.config.JerseyConfig;
-import com.example.resource.HelloWordResourse;
 
-import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.glassfish.jersey.servlet.ServletProperties;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
@@ -14,9 +11,7 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 
 import java.security.Key;
-import java.security.PublicKey;
 
-import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 
 import io.jsonwebtoken.SignatureAlgorithm;
