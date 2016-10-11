@@ -15,6 +15,12 @@
 *.patch
 *.tmp
 
+
+# log
+logs/
+log/
+*.log
+
 # system ignore
 .DS_Store
 Thumbs.db
@@ -34,3 +40,4 @@ hs_err_pid*
 
 #mvn ingnore
 .target/
+target/
