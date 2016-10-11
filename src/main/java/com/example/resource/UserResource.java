@@ -52,7 +52,7 @@ public class UserResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Cache
-    public Response listUserBean(@Context Request request) {
+    public Response listUserBean() {
         List<UserBean> userBeans = userBeanService.findAll();
         Response.ResponseBuilder responseBuilder = Response.ok(userBeans);
         return responseBuilder.build();
