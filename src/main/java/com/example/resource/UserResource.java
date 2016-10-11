@@ -1,14 +1,19 @@
 package com.example.resource;
 
+import com.example.annotation.Cache;
 import com.example.entity.bean.UserBean;
 import com.example.entity.mongo.User;
 import com.example.service.UserBeanService;
 import com.example.service.UserService;
+import com.example.util.JsonUtils;
+
+import org.springframework.util.DigestUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -18,7 +23,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 
 /**
@@ -47,14 +56,11 @@ public class UserResource {
     @Path("bean")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response listUserBean() {
-        logger.info("hello logger type={}", "info");
-        logger.warn("hello logger type={}", "warn");
-        logger.error("hello logger type={}", "error");
-        logger.debug("hello logger type={}", "debug");
-
+    @Cache
+    public Response listUserBean(@Context Request request) {
         List<UserBean> userBeans = userBeanService.findAll();
-        return Response.ok().entity(userBeans).build();
+        Response.ResponseBuilder responseBuilder = Response.ok(userBeans);
+        return responseBuilder.build();
     }
 
     @Path("bean")

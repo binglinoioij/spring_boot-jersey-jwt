@@ -1,5 +1,6 @@
 package com.example.config;
 
+import com.example.filter.CacheFilter;
 import com.example.filter.JWTSecurityFilter;
 
 import org.glassfish.jersey.jackson.JacksonFeature;
@@ -28,6 +29,7 @@ public class JerseyConfig extends ResourceConfig {
         register(RolesAllowedDynamicFeature.class);
         // jwt filter
         register(JWTSecurityFilter.class);
+        register(CacheFilter.class);
         // turn on Jackson, Moxy isn't that good of a solution.
         register(JacksonFeature.class);
 
