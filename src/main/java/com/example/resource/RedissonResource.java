@@ -1,6 +1,5 @@
 package com.example.resource;
 
-import org.redisson.Redisson;
 import org.redisson.api.RKeys;
 import org.redisson.api.RedissonClient;
 
