@@ -1,4 +1,4 @@
-package com.example.mybatis;
+package com.example.config;
 
 /**
  * Created by Ming on 2016/10/9.
@@ -12,7 +12,7 @@ import tk.mybatis.mapper.common.MySqlMapper;
  * @author liuzh
  * @since 2015-09-06 21:53
  */
-public interface MyMapper<T> extends Mapper<T>, MySqlMapper<T> {
+public interface BaseMapper<T> extends Mapper<T>, MySqlMapper<T> {
     //TODO
     //FIXME 特别注意，该接口不能被扫描到，否则会出错
 }

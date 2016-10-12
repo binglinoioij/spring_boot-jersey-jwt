@@ -42,7 +42,7 @@ public class UserBeanMapperTest {
     http://git.oschina.net/free/Mapper/blob/master/wiki/mapper3/5.Mappers.md
      */
     @Test
-    public void test_findByHost(){
+    public void testFindByHost(){
         MysqlUser mysqlUser = new MysqlUser();
         mysqlUser.setHost("localhost");
         System.out.println(JSON.toJSONString(mysqlUserMapper.select(mysqlUser)));
@@ -54,7 +54,7 @@ public class UserBeanMapperTest {
     http://git.oschina.net/free/Mybatis_PageHelper/blob/master/wikis/Important.markdown
      */
     @Test
-    public void test_page(){
+    public void testPage(){
         PageHelper.startPage(1, 3);
         List<MysqlUser> list = mysqlUserMapper.select(new MysqlUser());
         System.out.println(JSON.toJSONString(list));

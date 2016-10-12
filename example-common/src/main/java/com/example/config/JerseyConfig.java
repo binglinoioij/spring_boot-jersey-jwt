@@ -31,8 +31,6 @@ import io.jsonwebtoken.impl.crypto.MacProvider;
 @Component
 public class JerseyConfig extends ResourceConfig {
 
-    private static final Logger LOGGER = Logger.getLogger(ResourceConfig.class.getName());
-
     @Inject
     private Key key;
 

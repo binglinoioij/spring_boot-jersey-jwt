@@ -1,4 +1,4 @@
-package com.example.mybatis;
+package com.example.config;
 
 /**
  * Created by Ming on 2016/10/9.
@@ -29,7 +29,7 @@ public class MyBatisMapperScannerConfig {
         mapperScannerConfigurer.setBasePackage("com.example.mapper");
 
         Properties properties = new Properties();
-        properties.setProperty("mappers", "com.example.mybatis.MyMapper");
+        properties.setProperty("mappers", "com.example.config.BaseMapper");
         properties.setProperty("notEmpty", "false");
         properties.setProperty("IDENTITY", "MYSQL");
         mapperScannerConfigurer.setProperties(properties);
