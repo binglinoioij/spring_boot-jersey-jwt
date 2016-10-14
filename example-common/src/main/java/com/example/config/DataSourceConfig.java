@@ -35,6 +35,7 @@ public class DataSourceConfig {
         dataSource.setUrl(dataSourceSetting.getUrl());
         dataSource.setPassword(dataSourceSetting.getPassword());
         dataSource.setDriverClassName(dataSourceSetting.getDriverClassName());
+        dataSource.setName("DataSourceConfig");
         return dataSource;
     }
 

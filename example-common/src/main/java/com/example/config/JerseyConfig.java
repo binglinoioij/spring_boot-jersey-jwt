@@ -15,7 +15,9 @@ import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.security.Key;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,7 +36,7 @@ public class JerseyConfig extends ResourceConfig {
     @Inject
     private Key key;
 
-    public JerseyConfig() {
+    public JerseyConfig(){
         // roles security
         register(RolesAllowedDynamicFeature.class);
         // jwt filter
@@ -44,7 +46,15 @@ public class JerseyConfig extends ResourceConfig {
         // turn on Jackson, Moxy isn't that good of a solution.
         register(JacksonFeature.class);
         //logging feature
-        register(new LoggingFeature(Logger.getLogger(JerseyConfig.class.getName()),
+        Logger logger = Logger.getLogger(JerseyConfig.class.getName());
+//        FileHandler fileHandler = null;
+//        try {
+//            fileHandler = new FileHandler("%t_test.log");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        logger.addHandler(fileHandler);
+        register(new LoggingFeature(logger,
                 LoggingFeature.Verbosity.PAYLOAD_ANY));
 
         packages("com.example.resource", "com.example.provider");
