@@ -6,6 +6,7 @@ import com.example.entity.mongo.User;
 import com.example.service.UserBeanService;
 import com.example.service.UserService;
 
+import org.glassfish.jersey.server.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,9 +49,8 @@ public class UserResource {
     }
 
     @Path("bean")
-    @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Cache
+    @GET
     public Response listUserBean() {
         List<UserBean> userBeans = userBeanService.findAll();
         Response.ResponseBuilder responseBuilder = Response.ok(userBeans);
@@ -63,5 +63,14 @@ public class UserResource {
     public Response createUserBean(UserBean userBean) {
         userBeanService.save(userBean);
         return Response.status(Response.Status.CREATED).build();
+    }
+
+    @Path("subbean")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Class<BookResource> listSubUserBean() {
+        List<UserBean> userBeans = userBeanService.findAll();
+        Response.ResponseBuilder responseBuilder = Response.ok(userBeans);
+        return BookResource.class;
+        //return responseBuilder.build();
     }
 }

@@ -9,8 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 /**
@@ -37,8 +35,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<Book> listAll() {
-        return bookRepository.findAll(new PageRequest(0, 10)).getContent();
+    public Page<Book> listAll() {
+        return bookRepository.findAll(new PageRequest(0, 10));
     }
 
     @Override

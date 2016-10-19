@@ -68,13 +68,19 @@
 
     <!-- 指定一个包，name必填，additivity选填：控制是否继承父类appender，默认true -->
     <!-- level选填，如果木有指定从最近的父类继承，顶级为root的级别 -->
-    <logger name="org.linkinpark.commons.logbackLogging" level="DEBUG" additivity="true">
+    <!--<logger name="org.linkinpark.commons.logbackLogging" level="DEBUG" additivity="true">
         <appender-ref ref="FILE" />
-    </logger>
+    </logger>-->
 
     <!-- 指定一个具体的文件 -->
-    <logger name="org.linkinpark.commons.logbackLogging.LoggingBack2" level="ERROR" additivity="false">
+    <!--<logger name="org.linkinpark.commons.logbackLogging.LoggingBack2" level="ERROR" additivity="false">
         <appender-ref ref="LOGGINGBACK2" />
+    </logger>-->
+    <logger name="org.mongodb.driver.cluster" level="ERROR">
+        <appender-ref ref="FILE"/>
+    </logger>
+    <logger name="org.springframework.boot.DefaultListableBeanFactory" level="ERROE">
+        <appender-ref ref="FILE"/>
     </logger>
 
     <root level="DEBUG">

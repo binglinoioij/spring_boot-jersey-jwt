@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -79,15 +80,20 @@ public class BookResource {
     }
 
 
-    @Path("book")
+    @Path("/")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Page<Book> find(@QueryParam("name") String name, @QueryParam("page") @DefaultValue("0") Integer page,
                            @QueryParam("size") @DefaultValue("2") Integer size, @MatrixParam("sort") String sort,
                            @MatrixParam("type") String sortType) {
         System.out.println(sort + ":" + sortType);
-        Page<Book> byName = bookService.findByName(name, page, size);
-        return byName;
+        Page<Book> books = null;
+        if (null == name) {
+            books = bookService.listAll();
+        } else {
+            books = bookService.findByName(name, page, size);
+        }
+        return books;
     }
 
     @Path("{id}")
