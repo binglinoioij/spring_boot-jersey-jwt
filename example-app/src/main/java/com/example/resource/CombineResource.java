@@ -9,6 +9,8 @@ import org.glassfish.jersey.server.model.Parameter;
 import org.glassfish.jersey.server.model.Resource;
 import org.glassfish.jersey.server.model.ResourceMethod;
 import org.glassfish.jersey.server.model.RuntimeResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 
 import java.lang.reflect.InvocationTargetException;
@@ -47,6 +49,7 @@ public class CombineResource {
     @Context
     private ResourceContext resourceContext;
 
+    private static final Logger logger = LoggerFactory.getLogger(CombineResource.class);
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -59,9 +62,7 @@ public class CombineResource {
             //初始化UrlMethodMappingHolder的mapping，记录下每个url下给定的http method对应的ResourceMethod
             if (UrlMethodMappingHolder.isEmpty()) {
                 runtimeResources.stream().filter(root -> !(root.getFullPathRegex().startsWith("/application") || root.getFullPathRegex().equals("/")))
-                        .forEach(root -> {
-                            getMethod(root, UrlMethodMappingHolder.mapping);
-                        });
+                        .forEach(root -> getMethod(root, UrlMethodMappingHolder.mapping));
             }
             Map<CombineRequest, ResourceMethod> methodMap = new HashMap<CombineRequest, ResourceMethod>();
             combineRequest.forEach(x -> {
@@ -75,6 +76,10 @@ public class CombineResource {
                 Method handlingMethod = v.getInvocable().getHandlingMethod();
                 String[] parameterNames = localVariableTableParameterNameDiscoverer.getParameterNames(handlingMethod);
                 Object result = null;
+                CombineResponse combineResponse = new CombineResponse();
+                combineResponse.setUrl(k.getUrl());
+                combineResponse.setMethod(k.getMethod());
+                combineResponse.setHttpStatus(200);
                 try {
                     if (parameterNames != null && parameterNames.length > 0) {
                         Object[] objects = new Object[]{};
@@ -83,15 +88,10 @@ public class CombineResource {
                     } else {
                         result = handlingMethod.invoke(resource, null);
                     }
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    logger.error("invoke method error method={} , request={}", new Object[]{handlingMethod, k, e});
+                    combineResponse.setHttpStatus(500);
                 }
-                CombineResponse combineResponse = new CombineResponse();
-                combineResponse.setUrl(k.getUrl());
-                combineResponse.setMethod(k.getMethod());
-                combineResponse.setHttpStatus(200);
                 if (result instanceof Response) {
                     Response response = (Response) result;
                     combineResponse.setEntity(response.getEntity());

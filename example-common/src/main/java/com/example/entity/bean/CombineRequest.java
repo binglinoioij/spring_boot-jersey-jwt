@@ -36,4 +36,13 @@ public class CombineRequest {
     public void setParam(Map param) {
         this.param = param;
     }
+
+    @Override
+    public String toString() {
+        return "CombineRequest{" +
+                "url='" + url + '\'' +
+                ", method='" + method + '\'' +
+                ", param=" + param +
+                '}';
+    }
 }
