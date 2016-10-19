@@ -5,6 +5,7 @@ import com.example.exception.ServiceException;
 import com.example.repository.SequenceBuilder;
 import com.example.service.BookService;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 
 import java.net.URI;
@@ -88,7 +89,7 @@ public class BookResource {
                            @MatrixParam("type") String sortType) {
         System.out.println(sort + ":" + sortType);
         Page<Book> books = null;
-        if (null == name) {
+        if (StringUtils.isBlank(name)) {
             books = bookService.listAll();
         } else {
             books = bookService.findByName(name, page, size);

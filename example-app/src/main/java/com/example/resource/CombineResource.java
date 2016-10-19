@@ -9,10 +9,14 @@ import org.glassfish.jersey.server.model.Parameter;
 import org.glassfish.jersey.server.model.Resource;
 import org.glassfish.jersey.server.model.ResourceMethod;
 import org.glassfish.jersey.server.model.RuntimeResource;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,40 +55,53 @@ public class CombineResource {
         if (resourceContext instanceof JerseyResourceContext) {
             final JerseyResourceContext jerseyResourceContext = (JerseyResourceContext) resourceContext;
 
-            List<Resource> rootResources = jerseyResourceContext.getResourceModel().getRootResources();
             List<RuntimeResource> runtimeResources = jerseyResourceContext.getResourceModel().getRuntimeResourceModel().getRuntimeResources();
-//        runtimeResources.get(7).getChildRuntimeResources().get(0).getFullPathRegex();
+            //初始化UrlMethodMappingHolder的mapping，记录下每个url下给定的http method对应的ResourceMethod
             if (UrlMethodMappingHolder.isEmpty()) {
                 runtimeResources.stream().filter(root -> !(root.getFullPathRegex().startsWith("/application") || root.getFullPathRegex().equals("/")))
                         .forEach(root -> {
                             getMethod(root, UrlMethodMappingHolder.mapping);
                         });
             }
-            ArrayList<ResourceMethod> resourceMethods = combineRequest.stream().map(x -> UrlMethodMappingHolder.get(x.getUrl(), x.getMethod()))
-                    .collect(Collectors.toCollection(ArrayList::new));
-            ArrayList<Object> collect = resourceMethods.stream().filter(x -> x != null).map(x -> {
-                Class<?> handlerClass = x.getInvocable().getHandler().getHandlerClass();
-                Object resource = jerseyResourceContext.getResource(handlerClass);
-                Object invoke = null;
-                CombineResponse combineResponse = new CombineResponse();
+            Map<CombineRequest, ResourceMethod> methodMap = new HashMap<CombineRequest, ResourceMethod>();
+            combineRequest.forEach(x -> {
+                methodMap.put(x, UrlMethodMappingHolder.get(x.getUrl(), x.getMethod()));
+            });
+            LocalVariableTableParameterNameDiscoverer localVariableTableParameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+            List<CombineResponse> combineResponses = new ArrayList<>(combineRequest.size());
+            methodMap.forEach((k, v) -> {
+                Class<?> methodClass = v.getInvocable().getHandlingMethod().getDeclaringClass();
+                Object resource = jerseyResourceContext.getResource(methodClass);
+                Method handlingMethod = v.getInvocable().getHandlingMethod();
+                String[] parameterNames = localVariableTableParameterNameDiscoverer.getParameterNames(handlingMethod);
+                Object result = null;
                 try {
-                    Collection<Parameter> parameters = x.getInvocable().getHandler().getParameters();
-                    invoke = x.getInvocable().getHandlingMethod().invoke(resource, null);
-                    if (invoke instanceof Response) {
-                        Response response = (Response) invoke;
-
-                        combineResponse.setEntity(response.getEntity());
-                        combineResponse.setHttpStatus(response.getStatus());
+                    if (parameterNames != null && parameterNames.length > 0) {
+                        Object[] objects = new Object[]{};
+                        objects = Stream.of(parameterNames).map(p -> k.getParam().get(p)).collect(Collectors.toCollection(LinkedList::new)).toArray(objects);
+                        result = handlingMethod.invoke(resource, objects);
                     } else {
-                        combineResponse.setEntity(invoke);
+                        result = handlingMethod.invoke(resource, null);
                     }
-
-                } catch (IllegalAccessException | InvocationTargetException e) {
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
                     e.printStackTrace();
                 }
-                return combineResponse;
-            }).collect(Collectors.toCollection(ArrayList::new));
-            return Response.ok().entity(collect).build();
+                CombineResponse combineResponse = new CombineResponse();
+                combineResponse.setUrl(k.getUrl());
+                combineResponse.setMethod(k.getMethod());
+                combineResponse.setHttpStatus(200);
+                if (result instanceof Response) {
+                    Response response = (Response) result;
+                    combineResponse.setEntity(response.getEntity());
+                    combineResponse.setHttpStatus(response.getStatus());
+                } else {
+                    combineResponse.setEntity(result);
+                }
+                combineResponses.add(combineResponse);
+            });
+            return Response.ok().entity(combineResponses).build();
         }
         return null;
     }
