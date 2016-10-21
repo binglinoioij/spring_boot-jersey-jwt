@@ -11,7 +11,7 @@ public class CombineRequest {
 
     private String method;
 
-    private Map param;
+    private Map<String, Object> param;
 
     public String getUrl() {
         return url;

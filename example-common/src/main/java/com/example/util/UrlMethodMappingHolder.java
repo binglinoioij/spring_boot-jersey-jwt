@@ -24,13 +24,17 @@ public class UrlMethodMappingHolder {
     }
 
     public static ResourceMethod get(String url, String method) {
+        String key = url + "#" + method;
+        ResourceMethod resourceMethod = get(key);
+        if (resourceMethod != null) {
+            return resourceMethod;
+        }
         Map.Entry<String, ResourceMethod> stringResourceMethodEntry = mapping.entrySet().stream().filter(e -> {
             String[] split = e.getKey().split("#");
             Pattern pattern = Pattern.compile(split[0]);
             Matcher matcher = pattern.matcher(url);
             return (matcher.matches() && split[1].equalsIgnoreCase(method));
         }).findFirst().orElse(null);
-        return stringResourceMethodEntry != null ?
-                stringResourceMethodEntry.getValue() : null;
+        return stringResourceMethodEntry.getValue();
     }
 }

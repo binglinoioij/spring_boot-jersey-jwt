@@ -4,6 +4,7 @@ import com.example.entity.bean.CombineRequest;
 import com.example.entity.bean.CombineResponse;
 import com.example.util.UrlMethodMappingHolder;
 
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.glassfish.jersey.server.internal.JerseyResourceContext;
 import org.glassfish.jersey.server.model.Parameter;
 import org.glassfish.jersey.server.model.Resource;
@@ -81,15 +82,13 @@ public class CombineResource {
                 combineResponse.setMethod(k.getMethod());
                 combineResponse.setHttpStatus(200);
                 try {
-                    if (parameterNames != null && parameterNames.length > 0) {
-                        Object[] objects = new Object[]{};
-                        objects = Stream.of(parameterNames).map(p -> k.getParam().get(p)).collect(Collectors.toCollection(LinkedList::new)).toArray(objects);
-                        result = handlingMethod.invoke(resource, objects);
-                    } else {
-                        result = handlingMethod.invoke(resource, null);
-                    }
+                    Object[] objects = new Object[]{};
+                    objects = Stream.of(parameterNames).map(p ->
+                            k.getParam() == null ? null : k.getParam().get(p)
+                    ).collect(Collectors.toCollection(LinkedList::new)).toArray(objects);
+                    result = MethodUtils.invokeMethod(resource, handlingMethod.getName(), objects);
                 } catch (Exception e) {
-                    logger.error("invoke method error method={} , request={}", new Object[]{handlingMethod, k, e});
+                    logger.error("invoke method error method={} , request={}", handlingMethod, k, e);
                     combineResponse.setHttpStatus(500);
                 }
                 if (result instanceof Response) {
@@ -108,7 +107,7 @@ public class CombineResource {
 
     private Map getMethod(RuntimeResource resource, Map<String, ResourceMethod> map) {
         List<ResourceMethod> allMethods = resource.getResourceMethods();
-        allMethods.forEach(method -> {
+        allMethods.stream().filter(method -> !"OPTIONS".equals(method.getHttpMethod())).forEach(method -> {
             String regex = resource.getFullPathRegex().endsWith("/") ?
                     resource.getFullPathRegex().substring(0, resource.getFullPathRegex().length() - 1) : resource.getFullPathRegex();
             map.put(regex + "#" + method.getHttpMethod(), method);
